@@ -15,7 +15,7 @@ passport.use(
     {
       clientID: process.env.clientID,
       clientSecret: process.env.clientSecret,
-      callbackURL: 'http://localhost:3000/api/callback'
+      callbackURL: process.env.callback
     },
     function(accessToken, refreshToken, expires_in, profile, done) {
       spotifyApi.setAccessToken(accessToken);
