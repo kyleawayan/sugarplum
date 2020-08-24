@@ -18,7 +18,6 @@ passport.use(
       callbackURL: 'http://localhost:3000/api/callback'
     },
     function(accessToken, refreshToken, expires_in, profile, done) {
-      console.log(accessToken)
       spotifyApi.setAccessToken(accessToken);
       spotifyApi.getMe()
       .then(async function(data) {
@@ -27,13 +26,13 @@ passport.use(
       }, function(err) {
         console.log('user get error!', err);
       });
-      spotifyApi.getMyTopArtists({ time_range: "medium_term"
+      spotifyApi.getMyTopArtists({ time_range: "medium_term", limit: "10"
       })
       .then(async function(data) {
         // Output items
         client.connect(err => {
           const collection = client.db("sugarplum-webapp").collection("spotify profiles")
-          collection.insertOne( { username: `${username}`, spotifydata: data.body })
+          collection.insertOne( { username: `${username}`, topartists: data.body.items })
         });
       }, function(err) {
         console.log('top artists get error!', err);
