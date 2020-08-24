@@ -54,8 +54,8 @@ passport.use(
             };
             await collection.findOneAndUpdate(filter, updateDoc, options)
               .then(result => {
-                console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`)
-                console.log(result.upsertedId)
+                id = result.value._id
+                console.log(result.value._id)
               })
             console.log('done1')
           } finally {
