@@ -10,6 +10,7 @@ var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi()
 var username
 var toptracks
+var id
 
 passport.use(
   new SpotifyStrategy(
@@ -43,17 +44,25 @@ passport.use(
       .then(function(data) {
         // Output items
         async function run() {
-          await client.connect()
-          const collection = client.db("sugarplum-webapp").collection("spotify profiles")
-          const filter = { username: `${username}`}
-          const options = { upsert: true };
-          const updateDoc = {
-            $set: { username: `${username}`, topartists: data.body.items, toptracks: toptracks }
-          };
-          await collection.updateOne(filter, updateDoc, options)
-          await client.close();
+          try {
+            await client.connect()
+            const collection = client.db("sugarplum-webapp").collection("spotify profiles")
+            const filter = { username: `${username}`}
+            const options = { upsert: true };
+            const updateDoc = {
+              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks }
+            };
+            await collection.updateOne(filter, updateDoc, options)
+              .then(result => {
+                console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`)
+                console.log(result.upsertedId)
+              })
+            console.log('done1')
+          } finally {
+            await client.close();
+          }
         }
-        run()
+        run().catch(console.dir)
       }, function(err) {
         console.log('top artists get error!', err);
       });
