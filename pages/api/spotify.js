@@ -33,6 +33,7 @@ passport.use(
         client.connect(err => {
           const collection = client.db("sugarplum-webapp").collection("spotify profiles")
           collection.insertOne( { username: `${username}`, topartists: data.body.items })
+          client.close()
         });
       }, function(err) {
         console.log('top artists get error!', err);
