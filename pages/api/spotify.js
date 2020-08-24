@@ -52,7 +52,7 @@ passport.use(
             const updateDoc = {
               $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks }
             };
-            await collection.updateOne(filter, updateDoc, options)
+            await collection.findOneAndUpdate(filter, updateDoc, options)
               .then(result => {
                 console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`)
                 console.log(result.upsertedId)
