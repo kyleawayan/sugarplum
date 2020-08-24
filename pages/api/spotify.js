@@ -9,6 +9,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi()
 var username
+var toptracks
 
 passport.use(
   new SpotifyStrategy(
@@ -26,6 +27,17 @@ passport.use(
       }, function(err) {
         console.log('user get error!', err);
       });
+      spotifyApi.getMyTopTracks({ time_range: "medium_term", limit: "10"
+    })
+    .then(function(data) {
+      // Output items
+      async function run() {
+        toptracks = data.body.items
+      }
+      run()
+    }, function(err) {
+      console.log('top artists get error!', err);
+    });
       spotifyApi.getMyTopArtists({ time_range: "medium_term", limit: "10"
       })
       .then(function(data) {
@@ -33,8 +45,13 @@ passport.use(
         async function run() {
           await client.connect()
           const collection = client.db("sugarplum-webapp").collection("spotify profiles")
-          await collection.insertOne( { username: `${username}`, topartists: data.body.items })
-          client.close();
+          const filter = { username: `${username}`}
+          const options = { upsert: true };
+          const updateDoc = {
+            $set: { username: `${username}`, topartists: data.body.items, toptracks: toptracks }
+          };
+          await collection.updateOne(filter, updateDoc, options)
+          await client.close();
         }
         run()
       }, function(err) {
