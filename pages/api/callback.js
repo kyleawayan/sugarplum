@@ -1,5 +1,4 @@
 import nc from 'next-connect';
-import id from './spotify'
 var passport = require('passport');
 
 const handler = nc()
@@ -7,15 +6,32 @@ const handler = nc()
     failureRedirect: '/api/spotify',
     session: false
   }), (req, res) => {
-    function redirect() {
-      if(typeof id !== "undefined"){
-        res.redirect(id)
+    console.log(req.query.code)
+    async function getId() {
+      try {
+        await client.connect()
+        const collection = client.db("sugarplum-webapp").collection("spotify profiles")
+
+        const query = { token: req.query.code };
+
+        const options = {
+            projection: { _id: 1 },
+        };
+
+        const results = await collection.findOne(query, options);
+
+        console.log(results);
+        return {
+            props: {
+                results,
+            },
+        }
+
+      } finally {
+      await client.close();
+      }
     }
-    else{
-        setTimeout(waitForElement, 250);
-    }
-      res.redirect
-    }
+    res.json("hahaha i stole all ur spotify data HAAAHAHAHAHAAH its in my database now muahhaha jk just ur spotify top artists are there lmk and ill send them to u cuz sugarplum cant do it rn");
   })
 
 export default handler;

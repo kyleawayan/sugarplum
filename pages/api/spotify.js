@@ -1,6 +1,4 @@
-require('dotenv').config()
 import nc from 'next-connect';
-import { createPortal } from 'react-dom';
 var passport = require('passport');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const MongoClient = require('mongodb').MongoClient;
@@ -10,7 +8,6 @@ var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi()
 var username
 var toptracks
-var id
 
 passport.use(
   new SpotifyStrategy(
@@ -50,7 +47,7 @@ passport.use(
             const filter = { username: `${username}`}
             const options = { upsert: true };
             const updateDoc = {
-              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks }
+              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks, token: accessToken }
             };
             await collection.findOneAndUpdate(filter, updateDoc, options)
               .then(result => {
