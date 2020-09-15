@@ -1,6 +1,4 @@
-require('dotenv').config()
 import nc from 'next-connect';
-import { createPortal } from 'react-dom';
 var passport = require('passport');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const MongoClient = require('mongodb').MongoClient;
@@ -16,9 +14,10 @@ passport.use(
     {
       clientID: process.env.clientID,
       clientSecret: process.env.clientSecret,
-      callbackURL: process.env.callback
+      callbackURL: process.env.callback,
+      passReqToCallback: true,
     },
-    function(accessToken, refreshToken, expires_in, profile, done) {
+    function(req, accessToken, refreshToken, expires_in, profile, done) {
       spotifyApi.setAccessToken(accessToken);
       spotifyApi.getMe()
       .then(function(data) {
@@ -43,17 +42,20 @@ passport.use(
       .then(function(data) {
         // Output items
         async function run() {
-          await client.connect()
-          const collection = client.db("sugarplum-webapp").collection("spotify profiles")
-          const filter = { username: `${username}`}
-          const options = { upsert: true };
-          const updateDoc = {
-            $set: { username: `${username}`, topartists: data.body.items, toptracks: toptracks }
-          };
-          await collection.updateOne(filter, updateDoc, options)
-          await client.close();
+          try {
+            await client.connect()
+            const collection = client.db("sugarplum-webapp").collection("spotify profiles")
+            const filter = { username: `${username}`}
+            const options = { upsert: true };
+            const updateDoc = {
+              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks, code: req.query.code }
+            };
+            await collection.findOneAndUpdate(filter, updateDoc, options)
+          } finally {
+            await client.close();
+          }
         }
-        run()
+        run().catch(console.dir)
       }, function(err) {
         console.log('top artists get error!', err);
       });
@@ -65,6 +67,6 @@ const handler = nc()
   .get(passport.authenticate('spotify', {
     scope: ['user-top-read']
   }), (req, res) => {
-  })
+})
 
 export default handler;
