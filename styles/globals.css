@@ -19,6 +19,63 @@ h1 {
   text-align: center;
 }
 
+h2 {
+  margin-top: 20px !important;
+}
+
+h4 {
+  margin-top: 20px !important;
+}
+
 .top {
   text-align: center;
+}
+
+img {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+}
+
+.profile {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
+  width: 100px;
+}
+
+.number1 {
+  line-height: normal;
+  margin-bottom: 40px;
+  min-width: 160px;
+  line-height: 45%;
+}
+
+.number2 {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  margin-bottom: 40px;
+  min-width: 200px;
+  max-width: 350px;
+}
+
+.number3 {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 25%;
+  margin-bottom: 40px;
+  min-width: 150px;
+  max-width: 200px;
+}
+
+.selector {
+  margin-top: 30px;
+  position: relative;
+  right: 50px;
+  font-size: 12px;
+  display: none;
 }
