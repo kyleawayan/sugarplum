@@ -41,7 +41,7 @@ function Result({ results }) {
 export async function getStaticPaths() {
     return {
         // Only `/posts/1` and `/posts/2` are generated at build time
-        paths: [{ params: { id: '1' } }],
+        paths: [{ params: { id: '5f441181ee7acc282798b1ec' } }],
         // Enable statically generating additional pages
         // For example: `/posts/3`
         fallback: true,
