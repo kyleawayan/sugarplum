@@ -14,9 +14,10 @@ passport.use(
     {
       clientID: process.env.clientID,
       clientSecret: process.env.clientSecret,
-      callbackURL: process.env.callback
+      callbackURL: process.env.callback,
+      passReqToCallback: true,
     },
-    function(accessToken, refreshToken, expires_in, profile, done) {
+    function(req, accessToken, refreshToken, expires_in, profile, done) {
       spotifyApi.setAccessToken(accessToken);
       spotifyApi.getMe()
       .then(function(data) {
@@ -47,14 +48,9 @@ passport.use(
             const filter = { username: `${username}`}
             const options = { upsert: true };
             const updateDoc = {
-              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks, token: accessToken }
+              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks, code: req.query.code }
             };
             await collection.findOneAndUpdate(filter, updateDoc, options)
-              .then(result => {
-                id = result.value._id
-                console.log(result.value._id)
-              })
-            console.log('done1')
           } finally {
             await client.close();
           }
@@ -71,6 +67,6 @@ const handler = nc()
   .get(passport.authenticate('spotify', {
     scope: ['user-top-read']
   }), (req, res) => {
-  })
+})
 
 export default handler;
