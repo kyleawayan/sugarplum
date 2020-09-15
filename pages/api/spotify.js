@@ -3,11 +3,11 @@ var passport = require('passport');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const MongoClient = require('mongodb').MongoClient;
 const uri = process.env.uri;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi()
 var username
 var toptracks
+var pfp
 
 passport.use(
   new SpotifyStrategy(
@@ -23,6 +23,7 @@ passport.use(
       .then(function(data) {
         // Output items
         username = data.body.display_name
+        pfp = JSON.parse(JSON.stringify(data.body.images[0])).url
       }, function(err) {
         console.log('user get error!', err);
       });
@@ -42,18 +43,15 @@ passport.use(
       .then(function(data) {
         // Output items
         async function run() {
-          try {
-            await client.connect()
-            const collection = client.db("sugarplum-webapp").collection("spotify profiles")
-            const filter = { username: `${username}`}
-            const options = { upsert: true };
-            const updateDoc = {
-              $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks, code: req.query.code }
-            };
-            await collection.findOneAndUpdate(filter, updateDoc, options)
-          } finally {
-            await client.close();
-          }
+          const client = await MongoClient.connect(uri, { useUnifiedTopology: true, useNewUrlParser: true })
+          const collection = client.db("sugarplum-webapp").collection("spotify profiles")
+          const filter = { username: `${username}`}
+          const options = { upsert: true };
+          const updateDoc = {
+            $set: { date: new Date(), topartists: data.body.items, toptracks: toptracks, code: req.query.code, pfp: pfp, }
+          };
+          await collection.findOneAndUpdate(filter, updateDoc, options)
+          await client.close();
         }
         run().catch(console.dir)
       }, function(err) {
