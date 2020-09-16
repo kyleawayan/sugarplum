@@ -50,6 +50,7 @@ function Result({ results }) {
           <div className="profile">
             <Image src={results.pfp} roundedCircle />
             <p>{results.username}</p>
+            <p>updated {results.date.split('T')[0]}</p>
             <div className="selector">
               <Pagination>{items}</Pagination>
             </div>
